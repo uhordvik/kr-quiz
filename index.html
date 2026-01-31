@@ -242,6 +242,29 @@
   </div>
 
 <script>
+  
+  window.addEventListener("error", (e) => {
+  const card = document.getElementById("quizCard");
+  if (!card) return;
+  card.innerHTML = `
+    <div style="padding:16px">
+      <h2 style="margin:0 0 8px">⚠️ JavaScript-feil</h2>
+      <p style="margin:0 0 10px;color:#6b7280">
+        Dette betyr nesten alltid en manglende komma, parentes eller klamme.
+      </p>
+      <pre style="white-space:pre-wrap;background:#f8fafc;border:1px solid rgba(0,0,0,.1);padding:12px;border-radius:12px">${String(e.message || e.error || e)}</pre>
+      <p style="margin:10px 0 0;color:#6b7280">
+        Tips: Sjekk at <strong>alle objekter i quiz-arrayet</strong> ender med komma (unntatt siste), og at alle <strong>[ ]</strong> og <strong>{ }</strong> er lukket.
+      </p>
+    </div>
+  `;
+});
+
+  
+  
+  
+  
+  
   // Illustrasjoner per "bolk" (hostet eksternt – siden du skal ha dette på web)
   // Du kan bytte disse til egne bilder senere (anbefalt) ved å bruke dine egne URLer.
 
@@ -629,6 +652,7 @@
 </script>
 </body>
 </html>
+
 
 
 
