@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b5cff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+  <title>Kristendommens begynnelse – Quiz</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <!-- iOS hjem-skjerm ikon (SVG funker noen steder, men PNG anbefales også) -->
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <!-- Favicon -->
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --primary: #0b5cff;
+      --good: #16a34a;
+      --bad: #dc2626;
+      --shadow: 0 10px 30px rgba(0,0,0,.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 18px 14px 28px;
+    }
+
+    header {
+      display: grid;
+      gap: 6px;
+      margin: 8px 0 14px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.35rem;
+      letter-spacing: .2px;
+    }
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(0,0,0,.06);
+      gap: 10px;
+    }
+    .progress {
+      color: var(--muted);
+      font-size: .92rem;
+    }
+    .score {
+      font-weight: 600;
+      font-size: .92rem;
+      color: var(--muted);
+    }
+
+    .hero {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #e5e7eb;
+    }
+    .hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .hero .caption {
+      position: absolute;
+      left: 10px;
+      bottom: 10px;
+      background: rgba(17,24,39,.68);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: .85rem;
+      backdrop-filter: blur(6px);
+    }
+
+    .content {
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .q {
+      font-size: 1.15rem;
+      line-height: 1.3;
+      margin: 0;
+    }
+
+    .answers {
+      display: grid;
+      gap: 10px;
+    }
+
+    button.answer {
+      width: 100%;
+      text-align: left;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.10);
+      background: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform .03s ease, background .15s ease, border-color .15s ease;
+    }
+    button.answer:active { transform: scale(.99); }
+    button.answer:hover { background: #f3f6ff; border-color: rgba(11,92,255,.35); }
+
+    .feedback {
+      display: none;
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-size: .98rem;
+      line-height: 1.25;
+      border: 1px solid rgba(0,0,0,.10);
+      background: #f8fafc;
+    }
+    .feedback.good { border-color: rgba(22,163,74,.35); background: rgba(22,163,74,.08); }
+    .feedback.bad  { border-color: rgba(220,38,38,.35); background: rgba(220,38,38,.08); }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      padding: 14px;
+      border-top: 1px solid rgba(0,0,0,.06);
+    }
+
+    .btn {
+      flex: 1;
+      padding: 12px 12px;
+      border: none;
+      border-radius: 14px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .btn.primary { background: var(--primary); color: #fff; }
+    .btn.ghost { background: #eef2ff; color: #1f2937; }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+
+    .result {
+      display: none;
+      text-align: center;
+      padding: 18px 14px 16px;
+    }
+    .result h2 {
+      margin: 0 0 8px;
+      font-size: 1.35rem;
+    }
+    .result p {
+      margin: 0 0 14px;
+      color: var(--muted);
+    }
+    .pill {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #1f2937;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .small {
+      font-size: .92rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <h1>📖 Kristendommens begynnelse – Quiz</h1>
+      <p>50 spørsmål • 10. trinn • Flervalg</p>
+    </header>
+
+    <main class="card" id="quizCard" aria-live="polite">
+      <div class="topbar">
+        <div class="progress" id="progress">Spørsmål 1 av 50</div>
+        <div class="score" id="score">Poeng: 0</div>
+      </div>
+
+      <div class="hero">
+        <img id="heroImg" alt="Illustrasjon" />
+        <div class="caption" id="heroCaption">Bakgrunn og tid</div>
+      </div>
+
+      <div class="content">
+        <p class="q" id="questionText">...</p>
+
+        <div class="answers" id="answers"></div>
+
+        <div class="feedback" id="feedback"></div>
+      </div>
+
+      <div class="controls">
+        <button class="btn ghost" id="restartBtn" type="button">Start på nytt</button>
+        <button class="btn primary" id="nextBtn" type="button" disabled>Neste</button>
+      </div>
+
+      <section class="result" id="result">
+        <div class="pill" id="resultPill">Resultat</div>
+        <h2 id="resultTitle">Ferdig!</h2>
+        <p id="resultText"></p>
+        <div class="small" id="gradeText"></div>
+      </section>
+    </main>
+  </div>
+
+<script>
+  // Illustrasjoner per "bolk" (hostet eksternt – siden du skal ha dette på web)
+  // Du kan bytte disse til egne bilder senere (anbefalt) ved å bruke dine egne URLer.
+  const sections = [
+    {
+      name: "Bakgrunn og tid",
+      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Roman_Empire_Trajan_117AD.png/1280px-Roman_Empire_Trajan_117AD.png"
+    },
+    {
+      name: "Jesus og budskapet",
+      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/James_Tissot_-_The_Sermon_on_the_Mount_-_Google_Art_Project.jpg/1280px-James_Tissot_-_The_Sermon_on_the_Mount_-_Google_Art_Project.jpg"
+    },
+    {
+      name: "Oppstandelsen og de første kristne",
+      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Guido_Reni_-_The_Resurrection_of_Christ_-_WGA19226.jpg/1280px-Guido_Reni_-_The_Resurrection_of_Christ_-_WGA19226.jpg"
+    },
+    {
+      name: "Paulus og spredningen",
+      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Rembrandt_-_St_Paul_in_Prison.jpg/1024px-Rembrandt_-_St_Paul_in_Prison.jpg"
+    },
+    {
+      name: "Fra minoritet til statsreligion",
+      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Constantine%27s_Vision_%28Raphael%29.jpg/1280px-Constantine%27s_Vision_%28Raphael%29.jpg"
+    }
+  ];
+
+  // 50 spørsmål – nivå: 10. trinn
+  // c = indeks på riktig svar (0=A, 1=B, 2=C, 3=D)
+  const quiz = [
+    // 1–10 Bakgrunn og tid
+    { q:"Hvor oppsto kristendommen?", a:["Roma","Hellas","Midtøsten","Egypt"], c:2, s:0 },
+    { q:"Når levde Jesus (omtrent)?", a:["1000 f.Kr.","500 f.Kr.","0–30 e.Kr.","300 e.Kr."], c:2, s:0 },
+    { q:"Hvilket rike styrte området der Jesus levde?", a:["Perserriket","Det greske riket","Romerriket","Det egyptiske riket"], c:2, s:0 },
+    { q:"Jesus var selv:", a:["Romer","Greker","Kristen","Jøde"], c:3, s:0 },
+    { q:"Kristendommen vokste opprinnelig ut av hvilken religion?", a:["Islam","Jødedom","Hinduismen","Buddhismen"], c:1, s:0 },
+    { q:"Hvilken by var religiøst sentrum for jødene på Jesu tid?", a:["Roma","Alexandria","Jerusalem","Antiokia"], c:2, s:0 },
+    { q:"Hva betyr ordet «Messias» best?", a:["Lærer","Konge","Frelser/den salvede","Skribent"], c:2, s:0 },
+    { q:"Hvem ventet mange jøder på ifølge tradisjonen?", a:["En ny keiser","En ny gud","En Messias","En general"], c:2, s:0 },
+    { q:"Hva gjorde Jesus mest av ifølge evangeliene?", a:["Skrev bøker","Underviste","Ledet krig","Bygde templer"], c:1, s:0 },
+    { q:"Hvorfor ble romerne ofte skeptiske til nye bevegelser?", a:["De var imot religion","De fryktet opprør","De likte ikke jøder","De hatet handel"], c:1, s:0 },
+
+    // 11–20 Jesus og budskapet
+    { q:"Hva kalles Jesu fortellinger med en moral?", a:["Myter","Lignelser","Eventyr","Kronikker"], c:1, s:1 },
+    { q:"Hvem var Jesu disipler?", a:["Soldater","Prester","Elever/tilhengere","Konger"], c:2, s:1 },
+    { q:"Hvor mange disipler hadde Jesus ifølge tradisjonen?", a:["7","10","12","15"], c:2, s:1 },
+    { q:"Hva var et sentralt budskap hos Jesus?", a:["Makt","Hevn","Kjærlighet og tilgivelse","Rikdom"], c:2, s:1 },
+    { q:"Hvem var Jesus særlig opptatt av å hjelpe?", a:["Keisere","Soldater","De rike","De fattige og utstøtte"], c:3, s:1 },
+    { q:"Hva kritiserte Jesus ofte hos religiøse ledere (ifølge tekstene)?", a:["At de ikke kunne lese","Hyklersk religiøsitet","At de var for snille","At de var for fattige"], c:1, s:1 },
+    { q:"Hva menes ofte med «Guds rike» i Jesu budskap?", a:["Et nytt land","En hær","Guds vilje og nærvær blant mennesker","Tempelet i Jerusalem"], c:2, s:1 },
+    { q:"Hvorfor kunne Jesus bli sett som en trussel?", a:["Han var lege","Han samlet folk og utfordret makt","Han var soldat","Han samlet penger"], c:1, s:1 },
+    { q:"Hva var romernes vanligste reaksjon på mulig uro?", a:["De ignorerte det","De ga folk mer makt","De slo ned på det","De flyttet hovedstaden"], c:2, s:1 },
+    { q:"Hva var en viktig grunn til konflikt rundt Jesus?", a:["Matregler","Spørsmålet om autoritet og tolkning","Språkproblemer","Klima"], c:1, s:1 },
+
+    // 21–35 Oppstandelsen og de første kristne
+    { q:"Hvilken dødsstraff fikk Jesus (ifølge tradisjonen)?", a:["Steining","Hengning","Halshogging","Korsfestelse"], c:3, s:2 },
+    { q:"Hva hevdet disiplene etter Jesu død?", a:["At han flyktet","At han ble glemt","At han stod opp fra de døde","At han tok feil"], c:2, s:2 },
+    { q:"Hva kalles troen på at Jesus stod opp?", a:["Frelse","Oppstandelse","Åpenbaring","Dåp"], c:1, s:2 },
+    { q:"Hvorfor er oppstandelsen så viktig i kristendommen?", a:["Den viser at romerne tok feil","Den er grunnlaget for troen","Den beviser at tempelet var ødelagt","Den forklarer lovene"], c:1, s:2 },
+    { q:"Hvem var de første kristne først og fremst?", a:["Romerne","Greske filosofer","Jødiske tilhengere av Jesus","Persiske soldater"], c:2, s:2 },
+    { q:"Hvor møttes de første kristne ofte?", a:["I store katedraler","I templer","I hjem","På stadion"], c:2, s:2 },
+    { q:"Hva betyr ordet «evangelium» best?", a:["Lov","Gode nyheter","Straff","Hemmelig tekst"], c:1, s:2 },
+    { q:"Hvorfor ble kristne forfulgt i perioder?", a:["De var rike","De nektet å tilbe keiseren/gudene","De ville ha krig","De bygde for mange hus"], c:1, s:2 },
+    { q:"Hva var et mål for de første kristne fellesskapene?", a:["Samle skatt","Dele og støtte hverandre","Bygge palass","Lage hær"], c:1, s:2 },
+    { q:"Hva handler dåp vanligvis om i kristendommen?", a:["Å bli romer","Å markere start på tro/fellesskap","Å bli jøde","Å bli prest"], c:1, s:2 },
+    { q:"Hva var nattverd (eller brødsbrytelse) knyttet til?", a:["En militær seier","Måltid til minne om Jesus","En høstfest","En kongelig seremoni"], c:1, s:2 },
+    { q:"Hva symboliserer fisken (Ichthys) i tidlig kristendom?", a:["Lykke","Fellesskap","Et skjult Jesus-symbol/ trosbekjennelse","Dåp alene"], c:2, s:2 },
+    { q:"Hva kalles de fire fortellingene om Jesu liv i NT?", a:["Lover","Evangelier","Salmene","Krøniker"], c:1, s:2 },
+    { q:"Hva var en viktig grunn til at bevegelsen ikke døde ut etter korsfestelsen?", a:["Militær støtte","Troen på oppstandelsen","Rikdom","At de flyttet til Egypt"], c:1, s:2 },
+    { q:"Hvilken utfordring møtte de første kristne?", a:["Ingen ville høre","Interne og eksterne konflikter","De hadde for mange kirker","De hadde for mye penger"], c:1, s:2 },
+
+    // 36–45 Paulus og spredningen
+    { q:"Hvem var Paulus i tidlig kristendom?", a:["Keiser","En av de tolv disiplene","Misjonær og brevskriver","En romersk general"], c:2, s:3 },
+    { q:"Hva gjorde Paulus spesielt viktig?", a:["Han bygde tempelet","Han spredte kristendommen til mange steder","Han skrev alle evangeliene","Han stoppet kristendommen"], c:1, s:3 },
+    { q:"Hvem forkynte Paulus for?", a:["Bare jøder","Bare romere","Bare fattige","Både jøder og ikke-jøder"], c:3, s:3 },
+    { q:"Hvor reiste Paulus mest?", a:["Kun i Israel","Kun i Roma","Rundt Middelhavet","Kun i Egypt"], c:2, s:3 },
+    { q:"Hva skrev Paulus som ble en del av Bibelen?", a:["Evangelier","Brev","Lover","Sagn"], c:1, s:3 },
+    { q:"Hva førte Paulus’ arbeid til for religionens utvikling?", a:["Den ble mindre","Den ble bare jødisk","Den ble mer universell","Den ble helt hemmelig"], c:2, s:3 },
+    { q:"Hva betyr «apostel» best?", a:["Konge","Dommer","Sendebud/utsendt","Soldat"], c:2, s:3 },
+    { q:"Hvorfor var det kontroversielt å spre troen til ikke-jøder?", a:["De kunne ikke lære","Det utfordret tradisjon og identitet","De kunne ikke reise","De var for mange"], c:1, s:3 },
+    { q:"Hva var typisk for kristne menigheter tidlig?", a:["Store bygg","Små fellesskap med ledere","Ingen møter","Kun militære møter"], c:1, s:3 },
+    { q:"Hvilket språk var vanlig i mye av tidlig kristen tekstkultur?", a:["Norrønt","Latin og gresk","Sanskrit","Hebraisk alene"], c:1, s:3 },
+
+    // 46–50 Fra minoritet til statsreligion
+    { q:"Hvordan startet kristendommen historisk sett?", a:["Som statsreligion","Som en jødisk bevegelse rundt Jesus","Som romersk tradisjon","Som filosofi i Hellas"], c:1, s:4 },
+    { q:"Hvordan var forholdet til romerske myndigheter i starten?", a:["Alltid positivt","Ofte konfliktfylt","Alltid nøytralt","Alltid samarbeidsvillig"], c:1, s:4 },
+    { q:"Hva skjedde på 300-tallet som endret kristendommens situasjon?", a:["Den ble forbudt","Den ble tillatt/legalisert","Den forsvant","Den ble bare jødisk"], c:1, s:4 },
+    { q:"Hvilken keiser knyttes ofte til legaliseringen av kristendommen?", a:["Nero","Augustus","Konstantin","Trajan"], c:2, s:4 },
+    { q:"Hva kan vi si om kristendommens tidlige vekst?", a:["Den var alltid planlagt","Den var voldelig drevet","Den vokste uventet og raskt","Den skjedde bare i Norden"], c:2, s:4 }
+  ];
+
+  // Forklaringer (kort – vises etter svar)
+  const explain = (item) => {
+    // korte, enkle forklaringer; hvis du vil kan jeg fylle mer detaljer på alle 50
+    const correct = item.a[item.c];
+    return `Riktig svar: <strong>${correct}</strong>.`;
+  };
+
+  let order = [...quiz.keys()];
+  let idx = 0;
+  let score = 0;
+  let locked = false;
+
+  const progressEl = document.getElementById("progress");
+  const scoreEl = document.getElementById("score");
+  const qEl = document.getElementById("questionText");
+  const answersEl = document.getElementById("answers");
+  const feedbackEl = document.getElementById("feedback");
+  const nextBtn = document.getElementById("nextBtn");
+  const restartBtn = document.getElementById("restartBtn");
+  const heroImg = document.getElementById("heroImg");
+  const heroCaption = document.getElementById("heroCaption");
+  const resultEl = document.getElementById("result");
+  const resultText = document.getElementById("resultText");
+  const resultPill = document.getElementById("resultPill");
+  const resultTitle = document.getElementById("resultTitle");
+  const gradeText = document.getElementById("gradeText");
+
+  function gradeFromPercent(p) {
+    // enkel 1–6 (kan justeres)
+    if (p >= 90) return 6;
+    if (p >= 75) return 5;
+    if (p >= 60) return 4;
+    if (p >= 45) return 3;
+    if (p >= 30) return 2;
+    return 1;
+  }
+
+  function setSectionVisual(sectionIndex) {
+    const s = sections[Math.max(0, Math.min(sectionIndex, sections.length - 1))];
+    heroImg.src = s.img;
+    heroCaption.textContent = s.name;
+  }
+
+  function renderQuestion() {
+    locked = false;
+    nextBtn.disabled = true;
+    feedbackEl.style.display = "none";
+    feedbackEl.className = "feedback";
+
+    const item = quiz[order[idx]];
+
+    progressEl.textContent = `Spørsmål ${idx + 1} av ${quiz.length}`;
+    scoreEl.textContent = `Poeng: ${score}`;
+    qEl.textContent = item.q;
+
+    setSectionVisual(item.s);
+
+    answersEl.innerHTML = "";
+    item.a.forEach((txt, i) => {
+      const b = document.createElement("button");
+      b.className = "answer";
+      b.type = "button";
+      b.innerHTML = `<strong>${String.fromCharCode(65+i)}.</strong> ${txt}`;
+      b.addEventListener("click", () => choose(i));
+      answersEl.appendChild(b);
+    });
+
+    resultEl.style.display = "none";
+  }
+
+  function choose(i) {
+    if (locked) return;
+    locked = true;
+
+    const item = quiz[order[idx]];
+    const buttons = [...answersEl.querySelectorAll("button.answer")];
+
+    const correctIndex = item.c;
+    const isCorrect = i === correctIndex;
+
+    // marker knapper
+    buttons.forEach((b, bi) => {
+      b.disabled = true;
+      if (bi === correctIndex) {
+        b.style.borderColor = "rgba(22,163,74,.55)";
+        b.style.background = "rgba(22,163,74,.10)";
+      }
+      if (bi === i && !isCorrect) {
+        b.style.borderColor = "rgba(220,38,38,.55)";
+        b.style.background = "rgba(220,38,38,.10)";
+      }
+    });
+
+    if (isCorrect) score++;
+
+    // feedback
+    feedbackEl.style.display = "block";
+    feedbackEl.classList.add(isCorrect ? "good" : "bad");
+    feedbackEl.innerHTML = (isCorrect ? "✅ Riktig! " : "❌ Feil. ") + explain(item);
+
+    scoreEl.textContent = `Poeng: ${score}`;
+    nextBtn.disabled = false;
+  }
+
+  function showResult() {
+    const percent = Math.round((score / quiz.length) * 100);
+    const grade = gradeFromPercent(percent);
+
+    resultEl.style.display = "block";
+    resultPill.textContent = `Resultat: ${score}/${quiz.length} (${percent}%)`;
+    resultTitle.textContent = "Ferdig!";
+    resultText.innerHTML = `Du fikk <strong>${score}</strong> av <strong>${quiz.length}</strong> riktige.`;
+    gradeText.textContent = `Omtrent “karakter”: ${grade} (en enkel 1–6-skala basert på prosent).`;
+
+    // skjul quizinnhold visuelt litt
+    feedbackEl.style.display = "none";
+    answersEl.innerHTML = "";
+    qEl.textContent = "Vil du prøve igjen?";
+    nextBtn.disabled = true;
+  }
+
+  nextBtn.addEventListener("click", () => {
+    if (!locked && idx < quiz.length) return;
+    idx++;
+    if (idx < quiz.length) renderQuestion();
+    else showResult();
+  });
+
+  restartBtn.addEventListener("click", () => {
+    idx = 0;
+    score = 0;
+    locked = false;
+    // bland rekkefølgen (valgfritt – comment ut om du vil ha fast rekkefølge)
+    order = [...quiz.keys()].sort(() => Math.random() - 0.5);
+    renderQuestion();
+  });
+
+  // start (fast rekkefølge første gang)
+  renderQuestion();
+</script>
+</body>
+</html>
