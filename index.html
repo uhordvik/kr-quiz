@@ -205,7 +205,7 @@
   <div class="wrap">
     <header>
       <h1>📖 Kristendommens begynnelse – Quiz</h1>
-      <p>50 spørsmål • 10. trinn • Flervalg</p>
+      <p>50 spørsmål • ungdomsskole • Flervalg</p>
     </header>
 
     <main class="card" id="quizCard" aria-live="polite">
@@ -244,9 +244,8 @@
 <script>
   // Illustrasjoner per "bolk" (hostet eksternt – siden du skal ha dette på web)
   // Du kan bytte disse til egne bilder senere (anbefalt) ved å bruke dine egne URLer.
-  
   const svg = (title, emoji) =>
-  "data:image/svg+xml;utf8," +
+  "data:image/svg+xml;charset=utf-8," +
   encodeURIComponent(`
   <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
     <defs>
@@ -259,7 +258,7 @@
     <circle cx="1060" cy="160" r="120" fill="rgba(255,255,255,0.14)"/>
     <circle cx="220" cy="580" r="180" fill="rgba(255,255,255,0.10)"/>
     <text x="80" y="180" font-family="-apple-system,Segoe UI,Roboto,Arial" font-size="64" fill="white" font-weight="700">${title}</text>
-    <text x="80" y="280" font-family="-apple-system,Segoe UI,Roboto,Arial" font-size="190" fill="white">${emoji}</text>
+    <text x="80" y="310" font-family="-apple-system,Segoe UI,Roboto,Arial" font-size="200" fill="white">${emoji}</text>
     <text x="80" y="660" font-family="-apple-system,Segoe UI,Roboto,Arial" font-size="34" fill="rgba(255,255,255,0.85)">
       KR-Quiz • Illustrasjon
     </text>
@@ -273,6 +272,7 @@ const sections = [
   { name: "Paulus og spredningen", img: svg("Paulus og spredningen", "🧭") },
   { name: "Fra minoritet til statsreligion", img: svg("Statsreligion", "🏛️") }
 ];
+
 
   // 50 spørsmål – nivå: 10. trinn
   // c = indeks på riktig svar (0=A, 1=B, 2=C, 3=D)
@@ -480,4 +480,5 @@ const sections = [
 </script>
 </body>
 </html>
+
 
